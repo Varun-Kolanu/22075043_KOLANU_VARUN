@@ -1,5 +1,5 @@
 import random, string
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from .models import URL
 from django.http import HttpResponse
 from .forms import URLForm
@@ -16,7 +16,7 @@ def unique_short_code(length=6):
         if not URL.objects.filter(short_code=short_code).exists():
             return short_code
 
-def ShortenUrl(request):
+def ShortenUrlView(request):
     if request.method == 'POST':
         form = URLForm(request.POST)
         if form.is_valid():
@@ -25,14 +25,16 @@ def ShortenUrl(request):
             if url_in_db:
                 data = {
                     'form': form,
-                    'shortened_url': SITE_URL + "/" + url_in_db.short_code
+                    'shortened_url': SITE_URL + "/" + url_in_db.short_code,
+                    'long_url': long_url
                 }
                 return render(request, 'url/home.html', data)
             short_code = unique_short_code(6)
             URL.objects.create(long_url=long_url, short_code=short_code)
             data = {
                 'form': form,
-                'shortened_url': SITE_URL + "/" + short_code
+                'shortened_url': SITE_URL + "/" + short_code,
+                'long_url': long_url
             }
             return render(request, 'url/home.html', data)
         else:
@@ -44,3 +46,9 @@ def ShortenUrl(request):
     if request.method == 'GET':
         form = URLForm()
         return render(request, 'url/home.html', {'form': form})
+
+
+def RedirectView(request, short_code):
+    url_obj = get_object_or_404(URL,short_code=short_code)
+    print(url_obj)
+    return redirect(url_obj.long_url)

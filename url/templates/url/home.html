@@ -17,6 +17,6 @@
     </div>
     {% else %}
         <div>Your Shortened Url: </div>
-        <div> {{shortened_url}} </div>
+        <a href="{{long_url}}" target="blank"> {{shortened_url}} </a>
     {% endif %}
 {% endblock  %}
