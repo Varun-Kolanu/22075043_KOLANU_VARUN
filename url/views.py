@@ -27,7 +27,6 @@ def ShortenUrlView(request):
                 data = {
                     'form': form,
                     'shortened_url': SITE_URL + "/" + url_in_db.short_code,
-                    'long_url': long_url
                 }
                 return render(request, 'url/home.html', data)
             short_code = unique_short_code(6)
@@ -35,7 +34,6 @@ def ShortenUrlView(request):
             data = {
                 'form': form,
                 'shortened_url': SITE_URL + "/" + short_code,
-                'long_url': long_url
             }
             return render(request, 'url/home.html', data)
         else:
