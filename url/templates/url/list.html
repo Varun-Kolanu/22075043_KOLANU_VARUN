@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %} URL Shortener List {% endblock  %}
+
+{% block content %}
+    <table style="max-width: 100%;">
+        <tr>
+            <th>S.No. </th>
+            <th>Short Url</th>
+            <th>Long Url</th>
+        </tr>
+        {% for obj in url_objs %}
+            <tr>
+                <td style="padding: 10px;"> {{forloop.counter}} </td>
+                <td style="padding: 10px;"> {{ site_url }}/{{ obj.short_code }} </td>
+                <td style="max-width: 1000px; padding: 10px;"> {{ obj.long_url }} </td>
+            </tr>
+        {% endfor %}   
+    </table>
+{% endblock  %}

@@ -4,6 +4,7 @@ from .models import URL
 from django.http import HttpResponse
 from .forms import URLForm
 from url_shortener.settings import SITE_URL
+from django.views import generic
 
 # Create your views here.
 
@@ -52,3 +53,11 @@ def RedirectView(request, short_code):
     url_obj = get_object_or_404(URL,short_code=short_code)
     print(url_obj)
     return redirect(url_obj.long_url)
+
+def URLListView(request):
+    url_objs = URL.objects.all()
+    data = {
+        'url_objs': url_objs,
+        'site_url': SITE_URL
+    }
+    return render(request, 'url/list.html', data)
