@@ -4,8 +4,8 @@ from .views import ShortenUrlView, RedirectView, URLListView
 app_name = 'url'
 
 urlpatterns = [
-    path('', ShortenUrlView, name='shorten'),
-    path('url_list/', URLListView, name="url_list"),
-    path('<str:short_code>/', RedirectView, name="url_redirect"),
+    path('', ShortenUrlView.as_view(), name='shorten'),
+    path('url_list/', URLListView.as_view(), name="url_list"),
+    path('<str:short_code>/', RedirectView.as_view(), name="url_redirect"),
 ]
 

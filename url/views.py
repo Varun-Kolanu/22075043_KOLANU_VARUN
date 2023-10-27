@@ -1,10 +1,11 @@
 import random, string
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import URL
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from .forms import URLForm
 from url_shortener.settings import SITE_URL
-from django.views import generic
+from django.views import View
+from django.views.generic.detail import DetailView
 
 # Create your views here.
 
@@ -17,8 +18,8 @@ def unique_short_code(length=6):
         if not URL.objects.filter(short_code=short_code).exists():
             return short_code
 
-def ShortenUrlView(request):
-    if request.method == 'POST':
+class ShortenUrlView(View):
+    def post(self, request):
         form = URLForm(request.POST)
         if form.is_valid():
             long_url = form.cleaned_data.get('long_url')
@@ -42,20 +43,23 @@ def ShortenUrlView(request):
             }
             return render(request, 'url/home.html', data)
 
-    if request.method == 'GET':
+    def get(self, request):
         form = URLForm()
         return render(request, 'url/home.html', {'form': form})
 
+class RedirectView(View):
+    def get(self, request, short_code):
+        url_obj = URL.objects.filter(short_code=short_code).first()
+        if url_obj:
+            return redirect(url_obj.long_url)
+        else:
+            return HttpResponse("Not a valid short URL", status=404)
 
-def RedirectView(request, short_code):
-    url_obj = get_object_or_404(URL,short_code=short_code)
-    print(url_obj)
-    return redirect(url_obj.long_url)
-
-def URLListView(request):
-    url_objs = URL.objects.all()
-    data = {
-        'url_objs': url_objs,
-        'site_url': SITE_URL
-    }
-    return render(request, 'url/list.html', data)
+class URLListView(View):
+    def get(self, request):
+        url_objs = URL.objects.all()
+        data = {
+            'url_objs': url_objs,
+            'site_url': SITE_URL
+        }
+        return render(request, 'url/list.html', data)
