@@ -1,7 +1,9 @@
 import random, string
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from .models import URL
 from django.http import HttpResponse
+from .forms import URLForm
+from url_shortener.settings import SITE_URL
 
 # Create your views here.
 
@@ -14,5 +16,31 @@ def unique_short_code(length=6):
         if not URL.objects.filter(short_code=short_code).exists():
             return short_code
 
-def sample(request):
-    return HttpResponse(unique_short_code(6))
+def ShortenUrl(request):
+    if request.method == 'POST':
+        form = URLForm(request.POST)
+        if form.is_valid():
+            long_url = form.cleaned_data.get('long_url')
+            url_in_db = URL.objects.filter(long_url=long_url).first()
+            if url_in_db:
+                data = {
+                    'form': form,
+                    'shortened_url': SITE_URL + "/" + url_in_db.short_code
+                }
+                return render(request, 'url/home.html', data)
+            short_code = unique_short_code(6)
+            URL.objects.create(long_url=long_url, short_code=short_code)
+            data = {
+                'form': form,
+                'shortened_url': SITE_URL + "/" + short_code
+            }
+            return render(request, 'url/home.html', data)
+        else:
+            data = {
+                'form': form
+            }
+            return render(request, 'url/home.html', data)
+
+    if request.method == 'GET':
+        form = URLForm()
+        return render(request, 'url/home.html', {'form': form})

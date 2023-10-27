@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %} URL Shortener {% endblock  %}
+
+{% block content %}
+    <form method="post" action="{% url 'url:shorten' %}">
+        {% csrf_token %}
+        <label for=" {{form.long_url.id_for_label}} "> {{form.long_url.label}} </label>
+        <br>
+        {{form.long_url}}
+        <br>
+        <button type="submit">Generate</button>
+    </form>
+    {% if form.errors %}
+    <div style="color: red;">
+        {{ form.long_url.errors}}
+    </div>
+    {% else %}
+        <div>Your Shortened Url: </div>
+        <div> {{shortened_url}} </div>
+    {% endif %}
+{% endblock  %}
